@@ -58,11 +58,12 @@ def iniciar_modulo_asociar_palabras(root):
             respuestas_correctas += 1
             # Reproducir el sonido en un hilo separado
             threading.Thread(target=reproducir_sonido, args=(sonido_correcto,)).start()
-            mensaje = tk.Label(root, text="+10", font=("Comic Sans MS", 40), fg="green", bg="#FFDEAD")
+            mensaje = tk.Label(root, text="Correcto +10", font=("Comic Sans MS", 20), fg="green", bg="#FFDEAD")
+
         else:
             mensaje = tk.Label(root, text="Incorrecto", font=("Comic Sans MS", 20), fg="red", bg="#FFDEAD")
 
-        mensaje.pack(pady=20)
+        mensaje.pack(side="right", padx=40, pady=50)
 
         # Actualizar la barra de progreso
         progreso.set(indice_imagen_actual + 1)
