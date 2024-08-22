@@ -3,6 +3,7 @@ from tkinter import ttk
 from PIL import Image, ImageTk, ImageOps
 import pygame
 import threading
+import random
 
 # Inicializar pygame para sonidos
 pygame.mixer.init()
@@ -20,22 +21,33 @@ def iniciar_modulo_asociar_palabras(root):
     for widget in root.winfo_children():
         widget.destroy()
 
-    # Lista de imágenes y respuestas correctas
-    imagenes_y_respuestas = [
+    # Lista de imágenes y respuestas correctas (debe ser completa con 50 imágenes)
+    todas_las_imagenes_y_respuestas = [
         (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\manzana.png", "manzana"),
         (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\banana.png", "banana"),
-        # Agregar más imágenes y respuestas
+        # Agregar más imágenes y respuestas hasta tener 50
     ]
+
+    # Seleccionar 10 imágenes al azar
+    imagenes_y_respuestas = random.sample(todas_las_imagenes_y_respuestas, 10)
 
     respuestas_correctas = 0
     respuestas_totales = len(imagenes_y_respuestas)
     respuesta_actual = tk.StringVar()
     indice_imagen_actual = 0
 
+    # Crear marco para la barra de progreso
+    marco_progreso = tk.Frame(root, bg="#FFDEAD")
+    marco_progreso.pack(pady=20)
+
     # Crear barra de progreso
     progreso = tk.DoubleVar()
-    barra_progreso = ttk.Progressbar(root, variable=progreso, maximum=respuestas_totales, length=300)
-    barra_progreso.pack(pady=20)
+    barra_progreso = ttk.Progressbar(marco_progreso, variable=progreso, maximum=respuestas_totales, length=300)
+    barra_progreso.pack(side="left", padx=10)
+    
+    # Etiqueta de título para la barra de progreso a la derecha de la barra
+    etiqueta_progreso = tk.Label(marco_progreso, text="Progreso", font=("Comic Sans MS", 14), bg="#FFDEAD")
+    etiqueta_progreso.pack(side="right", padx=10)
 
     def cargar_imagen():
         nonlocal indice_imagen_actual
@@ -63,7 +75,7 @@ def iniciar_modulo_asociar_palabras(root):
         else:
             mensaje = tk.Label(root, text="Incorrecto", font=("Comic Sans MS", 20), fg="red", bg="#FFDEAD")
 
-        mensaje.pack(side="right", padx=40, pady=50)
+        mensaje.pack(side="right", padx=40, pady=10)
 
         # Actualizar la barra de progreso
         progreso.set(indice_imagen_actual + 1)
