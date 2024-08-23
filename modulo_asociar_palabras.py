@@ -25,6 +25,15 @@ def iniciar_modulo_asociar_palabras(root):
     todas_las_imagenes_y_respuestas = [
         (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\manzana.png", "manzana"),
         (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\banana.png", "banana"),
+        (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\carro.png", "carro"),
+        (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\sol.png", "sol"),
+        (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\luna.png", "luna"),
+        (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\flor.png", "flor"),
+        (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\gato.jpg", "gato"),
+        (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\perro.png", "perro"),
+        (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\casa.png", "casa"),
+        (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\gota.jpg", "gota"),
+        (r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Imagenes\pan.png", "pan")
         # Agregar más imágenes y respuestas hasta tener 50
     ]
 
