@@ -10,6 +10,8 @@ pygame.mixer.init()
 
 # Cargar sonido de respuesta correcta
 sonido_correcto = pygame.mixer.Sound(r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Sonidos\correcto.wav")
+# Cargar sonido de finalización
+sonido_finalizacion = pygame.mixer.Sound(r"C:\Users\acer\Desktop\Cosas U\10mo semestre\PG2\Sonidos\grito.wav")
 
 def reproducir_sonido(sonido):
     sonido.play()
@@ -37,6 +39,10 @@ def iniciar_modulo_asociar_palabras(root):
         # Agregar más imágenes y respuestas hasta tener 50
     ]
 
+    # Asegurarse de que haya suficientes imágenes
+    if len(todas_las_imagenes_y_respuestas) < 10:
+        raise ValueError("No hay suficientes imágenes para seleccionar.")
+
     # Seleccionar 10 imágenes al azar
     imagenes_y_respuestas = random.sample(todas_las_imagenes_y_respuestas, 10)
 
@@ -44,6 +50,7 @@ def iniciar_modulo_asociar_palabras(root):
     respuestas_totales = len(imagenes_y_respuestas)
     respuesta_actual = tk.StringVar()
     indice_imagen_actual = 0
+    respuestas_usuario = []
 
     # Crear marco para la barra de progreso
     marco_progreso = tk.Frame(root, bg="#FFDEAD")
@@ -60,37 +67,45 @@ def iniciar_modulo_asociar_palabras(root):
 
     def cargar_imagen():
         nonlocal indice_imagen_actual
-        ruta_imagen, respuesta_correcta = imagenes_y_respuestas[indice_imagen_actual]
-        imagen = Image.open(ruta_imagen)
-        imagen = imagen.resize((300, 300), Image.Resampling.LANCZOS)
-        
-        # Añadir un borde negro a la imagen
-        imagen_con_borde = ImageOps.expand(imagen, border=10, fill='black')
-        
-        imagen_tk = ImageTk.PhotoImage(imagen_con_borde)
+        if indice_imagen_actual < respuestas_totales:
+            ruta_imagen, respuesta_correcta = imagenes_y_respuestas[indice_imagen_actual]
+            imagen = Image.open(ruta_imagen)
+            imagen = imagen.resize((300, 300), Image.Resampling.LANCZOS)
+            
+            # Añadir un borde negro a la imagen
+            imagen_con_borde = ImageOps.expand(imagen, border=10, fill='black')
+            
+            imagen_tk = ImageTk.PhotoImage(imagen_con_borde)
 
-        label_imagen.config(image=imagen_tk)
-        label_imagen.image = imagen_tk
-        respuesta_actual.set("")
+            label_imagen.config(image=imagen_tk)
+            label_imagen.image = imagen_tk
+            respuesta_actual.set("")
+        else:
+            mostrar_resultados()
 
     def verificar_respuesta():
         nonlocal respuestas_correctas, indice_imagen_actual
-        if respuesta_actual.get().lower() == imagenes_y_respuestas[indice_imagen_actual][1]:
-            respuestas_correctas += 1
-            # Reproducir el sonido en un hilo separado
-            threading.Thread(target=reproducir_sonido, args=(sonido_correcto,)).start()
-            mensaje = tk.Label(root, text="Correcto +10", font=("Comic Sans MS", 20), fg="green", bg="#FFDEAD")
+        if indice_imagen_actual < respuestas_totales:
+            respuesta_usuario = respuesta_actual.get().strip().lower()
+            respuesta_correcta = imagenes_y_respuestas[indice_imagen_actual][1]
+            respuestas_usuario.append((respuesta_correcta, respuesta_usuario))
+            if respuesta_usuario == respuesta_correcta:
+                respuestas_correctas += 1
+                # Reproducir el sonido de respuesta correcta en un hilo separado
+                threading.Thread(target=reproducir_sonido, args=(sonido_correcto,)).start()
+                mensaje = tk.Label(root, text="Correcto +10", font=("Comic Sans MS", 20), fg="green", bg="#FFDEAD")
+            else:
+                mensaje = tk.Label(root, text="Incorrecto", font=("Comic Sans MS", 20), fg="red", bg="#FFDEAD")
 
+            mensaje.pack(side="right", padx=40, pady=10)
+
+            # Actualizar la barra de progreso
+            progreso.set(indice_imagen_actual + 1)
+
+            # Eliminar el mensaje después de un breve retraso y pasar a la siguiente imagen
+            root.after(1000, lambda: siguiente_imagen(mensaje))
         else:
-            mensaje = tk.Label(root, text="Incorrecto", font=("Comic Sans MS", 20), fg="red", bg="#FFDEAD")
-
-        mensaje.pack(side="right", padx=40, pady=10)
-
-        # Actualizar la barra de progreso
-        progreso.set(indice_imagen_actual + 1)
-
-        # Eliminar el mensaje después de un breve retraso y pasar a la siguiente imagen
-        root.after(1000, lambda: siguiente_imagen(mensaje))
+            mostrar_resultados()
 
     def siguiente_imagen(mensaje):
         nonlocal indice_imagen_actual
@@ -99,7 +114,25 @@ def iniciar_modulo_asociar_palabras(root):
         if indice_imagen_actual < respuestas_totales:
             cargar_imagen()
         else:
-            tk.Label(root, text=f"Finalizado. Correctas: {respuestas_correctas}/{respuestas_totales}", font=("Comic Sans MS", 20), bg="#FFDEAD").pack(pady=20)
+            # Reproducir el sonido de finalización
+            threading.Thread(target=reproducir_sonido, args=(sonido_finalizacion,)).start()
+            mostrar_resultados()
+
+    def mostrar_resultados():
+        for widget in root.winfo_children():
+            widget.destroy()
+
+        tk.Label(root, text=f"Finalizado. Correctas: {respuestas_correctas}/{respuestas_totales}", font=("Comic Sans MS", 20), bg="#FFDEAD").pack(pady=20)
+
+        resultados_texto = tk.StringVar()
+        resultados_texto.set("Respuestas:\n")
+        for correcta, usuario in respuestas_usuario:
+            resultados_texto.set(resultados_texto.get() + f"Imagen: {correcta}, Tu respuesta fue: {usuario}\n")
+        
+        tk.Label(root, textvariable=resultados_texto, font=("Comic Sans MS", 14), bg="#FFDEAD").pack(pady=20)
+
+        boton_regresar = tk.Button(root, text="Regresar", command=lambda: regresar_a_principal(root), font=("Comic Sans MS", 14), bg="#FF6347", fg="white")
+        boton_regresar.pack(pady=10)
 
     # Crear la interfaz del módulo
     label_imagen = tk.Label(root, bg="#FFDEAD")
